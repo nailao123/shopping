@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ES6-2demo演示</title>
+</head>
+<body>
+
+
+<script>
+
+    function  sun( x,y,z){
+        let total=0;
+        if(x)total+=x;
+        if(y)total+=y;
+        if(z)total+=z;
+
+        console.log(`total:${total}`)
+
+    }
+
+    sun(5,"",9)
+
+  /*动态函数*/
+  function sum(...m) {
+      let total=0;
+      for (var i of m){
+          total+=i;
+      }
+    console.log(`total:${total}`)
+  }
+  sum(4,8,9,10,11,);
+
+  let sum3 =(...m)=>{
+    let total=0;
+    for (var i of m){
+      total+=i;
+    }
+    console.log(`total:${total}`)
+  };
+    sum3(4,8,9,10,11,);
+
+    let arr1=[1,2,3]; let arr2=[4,5,,6];
+    console.log("concat"+arr1.concat(arr2));
+
+    /*动态数组*/
+    var [x,...y] =[4,5,6,7,8];
+    console.log([x,...y].length);
+</script>
+
+</body>
+</html>
