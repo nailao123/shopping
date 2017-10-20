@@ -59,14 +59,14 @@
             <ul>
               <li class="regi_form_input">
                 <i class="icon IconPeople"></i>
-                <input type="text" tabindex="1" v-model="userName"  name="loginname"class="regi_login_input regi_login_input_left" /></li>
+                <input type="text" tabindex="1" v-model="userName"  name="loginname"class="regi_login_input regi_login_input_left" placeholder="请输入用户名" /></li>
               <li class="regi_form_input noMargin">
                 <i class="icon IconPwd"></i>
-                <input type="password" tabindex="2"  v-model="userPwd" name="password"   class="regi_login_input regi_login_input_left login-input-no input_text" /></li>
+                <input type="password" tabindex="2"  v-model="userPwd" name="password"   class="regi_login_input regi_login_input_left login-input-no input_text"  placeholder="请输入密码" @keyup.enter="login" /></li>
             </ul>
           </div>
           <div class="login-wrap">
-            <a href="javascript:;" class="btn-login" @click="login();">登 录</a>
+            <a href="javascript:;" class="btn-login" @click="login">登 录</a>
         </div>
       </div>
     </div>

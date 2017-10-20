@@ -80,6 +80,38 @@ router.get( "/checkLogin",function (req,res,next) {
   }
 );
 
+//查询当前用户的购物车数据
+/*
+* 1.需要通过cookies获取当前用户数据
+*
+*
+* */
+router.get('/cartList',function (req,res,next) {
+    var userId =req.cookies.userId;
+
+    User.findOne({userId:userId},function (err,doc) {
+        if (err){
+          res.json({
+            status:'1',
+            msg:err.message,
+            result:''
+          });
+        }else{
+          if (doc){
+
+            res.json({
+              status:'0',
+              msg:'',
+              result: doc.cartList
+            });
+          }
+
+      }
+
+    });
+
+});
+
 
 
 

@@ -39,7 +39,7 @@
         <ul>
           <li v-for="item in goodsList">
             <div class="pic">
-              <a href="#"><img  v-bind:src="'/static/'+item.productImage" alt=""></a>
+              <a href="#"><img  v-bind:src="'/static/'+item.productImage" v-bind:alt="item.productName"></a>
 
             </div>
             <div class="main">
