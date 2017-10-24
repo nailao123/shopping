@@ -123,7 +123,7 @@
                 总计: <span class="total-price">{{totalPrice | currency('￥')}}</span>
               </div>
               <div class="btn-wrap">
-                <a class="btn btn--red">Checkout</a>
+                <a class="btn btn--red" v-bind:class="{'btn--dis':checkedCount==0}"  @click="checkOut">确认</a>
               </div>
             </div>
           </div>
@@ -167,6 +167,7 @@
 <script>
   import './../assets/css/checkout.css'
   import './../assets/css/base.css'
+  import './../assets/css/login.css'
   import './../assets/css/login.css'
   import NavHeader from '@/components/Header.vue'
   import NavFooter from '@/components/NavFooter.vue'
@@ -295,16 +296,27 @@
                   console.log('update suc');
                 }
 
-            });
+          });
+      },
+/*
+* 确认支付跳转地址页面
+*1. 首先需要判断当前购物车中是否又选中的商品
+*2.通过api方式实现路由 跳转
+*
+* */
+
+        checkOut(){
+              if(this.checkedCount>0){
+                    this.$router.push({
+                      path:"/address"
+                  });
+
+              }
 
 
-
-
+           },
       }
 
 
-
-
-      }
   }
 </script>
