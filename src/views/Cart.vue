@@ -2,7 +2,7 @@
   <div>
     <nav-header></nav-header>
     <nav-bread>
-      <span>My Cart</span>
+      <span>我的购物车</span>
     </nav-bread>
 
     <svg style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1"
@@ -46,24 +46,24 @@
     <div class="container">
       <div class="cart">
         <div class="page-title-normal">
-          <h2 class="page-title-h2"><span>My Cart</span></h2>
+          <h2 class="page-title-h2"><span>我的购物车</span></h2>
         </div>
         <div class="item-list-wrap">
           <div class="cart-item">
             <div class="cart-item-head">
               <ul>
-                <li>Items</li>
-                <li>Price</li>
-                <li>Quantity</li>
-                <li>Subtotal</li>
-                <li>Edit</li>
+                <li>产品</li>
+                <li>单价</li>
+                <li>数量</li>
+                <li>金额</li>
+                <li>删除</li>
               </ul>
             </div>
             <ul class="cart-item-list">
               <li v-for="item in cartList">
                 <div class="cart-tab-1">
                   <div class="cart-item-check">
-                    <a href="javascipt:;" class="checkbox-btn item-check-btn">
+                    <a  class="checkbox-btn item-check-btn" v-bind:class="{'check':item.checked=='1'}"  @click="editCart('checked',item)">
                       <svg class="icon icon-ok">
                         <use xlink:href="#icon-ok"></use>
                       </svg>
@@ -77,25 +77,25 @@
                   </div>
                 </div>
                 <div class="cart-tab-2">
-                  <div class="item-price">{{item.salePrice}}</div>
+                  <div class="item-price">{{(item.salePrice) | currency('￥')}}</div>
                 </div>
                 <div class="cart-tab-3">
                   <div class="item-quantity">
                     <div class="select-self select-self-open">
                       <div class="select-self-area">
-                        <a class="input-sub">-</a>
+                        <a class="input-sub"  @click="editCart('minu',item)">-</a>
                         <span class="select-ipt">{{item.productNum}}</span>
-                        <a class="input-add">+</a>
+                        <a class="input-add" @click="editCart('add',item)">+</a>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="cart-tab-4">
-                  <div class="item-price-total">{{item.productNum*item.salePrice}}</div>
+                  <div class="item-price-total">{{(item.productNum*item.salePrice) | currency('￥')}}</div>
                 </div>
                 <div class="cart-tab-5">
                   <div class="cart-item-opration">
-                    <a href="javascript:;" class="item-edit-btn">
+                    <a href="javascript:;" class="item-edit-btn" @click="delCartConfirm(item.productId);">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
                       </svg>
@@ -110,17 +110,17 @@
           <div class="cart-foot-inner">
             <div class="cart-foot-l">
               <div class="item-all-check">
-                <a href="javascipt:;">
-                  <span class="checkbox-btn item-check-btn">
+                <a href="javascipt:; "@click="toggleCheckAll">
+                  <span class="checkbox-btn item-check-btn" v-bind:class="{'check':checkAllFlag}">
                     <svg class="icon icon-ok"><use xlink:href="#icon-ok"/></svg>
                   </span>
-                  <span>Select all</span>
+                  <span>全选</span>
                 </a>
               </div>
             </div>
             <div class="cart-foot-r">
               <div class="item-total">
-                Item total: <span class="total-price">500</span>
+                总计: <span class="total-price">{{totalPrice | currency('￥')}}</span>
               </div>
               <div class="btn-wrap">
                 <a class="btn btn--red">Checkout</a>
@@ -130,6 +130,13 @@
         </div>
       </div>
     </div>
+    <Modal :mdShow="modalConfirm" @close="closeModal">
+      <p slot="message">你确认要删除此条数据么？</p>
+      <div slot="btnGroup" >
+        <a class="btn btn--m" href="javascript:;" @click="delCart">确认</a>
+      <a class="btn btn--m" href="javascript:;" @click="modalConfirm = false">关闭</a>
+      </div>
+    </Modal>
     <nav-footer></nav-footer>
   </div>
 </template>
@@ -165,13 +172,44 @@
   import NavFooter from '@/components/NavFooter.vue'
   import NavBread from '@/components/NavBread.vue'
   import Modal from './../components/Modal'   //导入模态框 使用组件必须将他加入到conmponents中
+  import {currency} from './../util/currency' //导入金额格式化插件
   import axios from 'axios'
   export default{
         data(){
             return{
-                cartList:[]
+                cartList:[],
+                modalConfirm:false,
+                productId :'',
             }
          },
+
+        computed:{ //
+              checkAllFlag(){
+              return this.checkedCount == this.cartList.length;
+            },
+
+            checkedCount(){//购物车中选中的商品数量进行实时计算 主要采用循环遍历购物车中数量与选中商品的数量是否一直来时是否为全选
+                var i = 0;
+                this.cartList.forEach((item)=>{
+                if(item.checked=='1')i++;
+              })
+                return i;
+              },
+
+              totalPrice(){ //总价计算
+              var money = 0;
+              this.cartList.forEach((item)=>{
+              if(item.checked=='1'){
+              money += parseFloat(item.salePrice)*parseInt(item.productNum);
+            }
+            })
+              return money;
+            }
+
+
+        },
+
+
       components:{
             NavHeader,
             NavFooter,
@@ -184,6 +222,10 @@
           this.init();
         },
 
+ /*       filters:{ //局部过滤器 对金额进行过滤
+        currency:currency
+      },*/
+
         methods:{
            //init方法初始化调用数据
             init(){
@@ -191,8 +233,78 @@
                   let res=response.data;
                   this.cartList=res.result;
               });
-            }
+            },
+        //弹框的方法
+           delCartConfirm(productId){
+            this.productId=productId; //将获取的productId变成全局变量 方便 删除方法获取产品id
+            this.modalConfirm =true;
+
+      },
+
+        closeModal(){
+          this.modalConfirm =false;
+        },
+
+        //删除购物车中的商品
+            delCart(){
+              axios.post("users/cartDel",{
+                productId:this.productId,
+                }).then((response)=>{
+                    let res=response.data;
+                    if(res.status=='0'){ //根据后台返回的操作状态0为操作成功 关掉提示框
+                   this.modalConfirm =false;
+                    this.init();//重新调用查询方法 刷新数据 删除后的数据重新刷新
+                }
+                })
+          },
+
+         editCart(flag,item){
+              if(flag=='add'){
+                    item.productNum++;
+                }else if(flag=='minus'){
+                  if(item.productNum<=1){   //需要对购物车中商品的数量进行限制  如果小于一件 直接返回
+                        return ;
+                      }
+                        item.productNum--;
+                }else{
+                      item.checked=item.checked=="1"?'0':'1';
+                }
+              axios.post("/users/cartEdit",{
+                  productId:item.productId,
+                  productNum:item.productNum,
+                  checked :item.checked,
+
+              }).then((response)=>{
+                  let res =response.data;
+            })
+        },
+  /**
+   * 该方法实现全选全消
+   */
+      toggleCheckAll(){
+            var flag=! this.checkAllFlag; //取反实现全选和取消全选
+            this.cartList.forEach((item)=>{   //循环遍历购物车列表中每一个item，然后将全选或者全消的值传递给每一个购物车中的商品
+            item.checked =flag?'1':'0';
+            })
+        axios.post("/users/editCheckAll",{
+            checkAll:flag
+
+            }).then((response)=>{
+                let res= response.data;
+                if(res.status=='0'){
+                  console.log('update suc');
+                }
+
+            });
+
+
+
 
       }
-}
+
+
+
+
+      }
+  }
 </script>

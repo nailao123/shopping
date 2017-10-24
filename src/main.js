@@ -4,7 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import lazy from 'vue-lazyload'
+import {currency} from './util/currency'
 import  infiniteScoll from 'vue-infinite-scroll'
+
 
 
 
@@ -13,6 +15,7 @@ Vue.config.productionTip = false
 
 Vue.use(infiniteScoll)
 
+Vue.filter("currency",currency);
 
 Vue.use(lazy,{
   loading: "/static/loading-svg/loading-spinning-bubbles.svg"

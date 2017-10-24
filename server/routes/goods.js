@@ -160,8 +160,8 @@ router.post("/addCart",function (req,res,next) {
                   })
                 }else {
                   if(doc){
-                    doc.productNum ='1';
-                    doc.checked ='1';
+                    doc.productNum ='1';  //该字段为商品数量
+                    doc.checked ='1';   //该字段为是否选中
                     userDoc.cartList.push(doc);
                     userDoc.save(function (err2,doc2) {
 
